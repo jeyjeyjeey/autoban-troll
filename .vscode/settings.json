@@ -1,0 +1,28 @@
+{
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "79"
+    ],
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length",
+        "160"
+    ],
+    "python.linting.pylintEnabled": false,
+    "python.sortImports.args": [
+        "--atomic"
+    ],
+    "[python]": {
+        // black and isort on saving Python file
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    // for E2E (gauge)
+    "files.associations": {
+        "*.spec": "gauge",
+        "*.cpt": "gauge"
+    }
+}
