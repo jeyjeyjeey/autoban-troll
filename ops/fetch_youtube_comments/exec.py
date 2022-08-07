@@ -56,7 +56,7 @@ if __name__ == "__main__":
             encoding="utf-8",
         ) as f:
             for line in res["items"]:
-                json.dump(line, f)
+                json.dump(line, f, ensure_ascii=False)
                 f.write("\n")
 
         sleep(60)
