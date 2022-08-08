@@ -2,14 +2,15 @@ import json
 import os
 from argparse import ArgumentParser
 from time import sleep
+from typing import Any, Dict, List
 from urllib import parse, request
 
 
 class YoutubeChatFether:
-    def __init__(self, api_key) -> None:
+    def __init__(self, api_key: str) -> None:
         self.key = api_key
 
-    def get_live_chat_id(self, live_url: str):
+    def get_live_chat_id(self, live_url: str) -> str:
         req_params = parse.urlencode(
             {
                 "key": self.key,
@@ -22,7 +23,9 @@ class YoutubeChatFether:
             res = json.loads(r.read().decode(encoding="utf-8"))
             return res["items"][0]["liveStreamingDetails"]["activeLiveChatId"]
 
-    def get_live_chat(self, live_chat_id: str, next_page_token: str = None):
+    def get_live_chat(
+        self, live_chat_id: str, next_page_token: str = None
+    ) -> List[Dict(str, Any)]:
         params = {
             "key": self.key,
             "part": "snippet, authorDetails",
