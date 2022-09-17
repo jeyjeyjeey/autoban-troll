@@ -2,7 +2,7 @@ import json
 import os
 from argparse import ArgumentParser
 from time import sleep
-from typing import Any, Dict, List
+from typing import Any, List
 from urllib import parse, request
 
 
@@ -25,7 +25,7 @@ class YoutubeChatFether:
 
     def get_live_chat(
         self, live_chat_id: str, next_page_token: str = None
-    ) -> List[Dict(str, Any)]:
+    ) -> List[dict[str, Any]]:
         params = {
             "key": self.key,
             "part": "snippet, authorDetails",
