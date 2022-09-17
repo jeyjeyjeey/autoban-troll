@@ -13,31 +13,9 @@ import BuildIcon from '@mui/icons-material/Build';
 import TokenIcon from '@mui/icons-material/Token';
 import type {comment, annotation} from './data'
 import { jsonData } from './data'
-import { Foundation } from '@mui/icons-material';
 
 
 const Home: NextPage = () => {
-  function createHandleToggle(setter: Function, toBeSet: Array<number>): Function {
-    return (value: number) => () => {
-      const currentIndex = toBeSet.indexOf(value);
-      const newChecked = [...toBeSet];
-  
-      if (currentIndex === -1) {
-        newChecked.push(value);
-      } else {
-        newChecked.splice(currentIndex, 1);
-      }
-  
-      setter(newChecked);
-    };
-  }
-  const [checkedSlander, setCheckedSlander] = React.useState<Array<number>>([]);
-  const handleToggleSlander = createHandleToggle(setCheckedSlander, checkedSlander)
-  const [checkedInstruction, setCheckedInstruction] = React.useState<Array<number>>([]);
-  const handleToggleInstruction = createHandleToggle(setCheckedInstruction, checkedInstruction)
-  const [checkedAutonomy, setCheckedAutonomy] = React.useState<Array<number>>([]);
-  const handleToggleAutonomy = createHandleToggle(setCheckedAutonomy, checkedAutonomy)
-
   let data: Array<comment> = jsonData;
   const annotationDefault: annotation = {
     isSlander: false,
