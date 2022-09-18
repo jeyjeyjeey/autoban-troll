@@ -6,7 +6,8 @@ export type comment = {
 }
 
 type snippet = {
-    messageText: string
+    type: string,
+    displayMessage: string
 }
 
 type authorDetails = {
@@ -24,6 +25,12 @@ export type annotation = {
     isInstruction: boolean
     isAutonomy: boolean
 }
+
+export const annotationDefault: annotation = {
+    isSlander: false,
+    isInstruction: false,
+    isAutonomy: false
+  }
 
 export const jsonData = [
     {

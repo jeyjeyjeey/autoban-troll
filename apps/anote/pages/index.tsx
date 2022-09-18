@@ -7,26 +7,20 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Checkbox from '@mui/material/Checkbox';
+import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import BuildIcon from '@mui/icons-material/Build';
 import TokenIcon from '@mui/icons-material/Token';
-import type {comment, annotation} from './data'
-import { jsonData } from './data'
+import type {comment} from './data'
+import {annotationDefault} from './data'
 
 
 const Home: NextPage = () => {
-  let data: Array<comment> = jsonData;
-  const annotationDefault: annotation = {
-    isSlander: false,
-    isInstruction: false,
-    isAutonomy: false
-  }
-  data.forEach(d => d.annotation = annotationDefault)
-  const [comments, setComments] = React.useState<Array<comment>>(data);
+  const [comments, setComments] = React.useState<Array<comment>>(Array());
+  const [filename, setFilename] = React.useState<String>();
 
   function reverseAnnotationOf(anotationType: string, id: string) {
-    // console.log(`slander before set: ${comments[0].annotation?.isSlander}`)
     const foundIndex: number = comments.findIndex(d => d.id == id);
     let foundComment = { ...comments[foundIndex] };
     if (anotationType == "slander") {
@@ -40,58 +34,117 @@ const Home: NextPage = () => {
     }
     comments.splice(foundIndex, 1, foundComment);
     setComments(Array(...comments));
-    // console.log(`slander after set: ${comments[0].annotation?.isSlander}`)
   }
 
+  async function changeUploadFile(event: any) {
+    const files = event.target.files;
+    const text = await readFileAsText(files[0]);
+    const parsed = text.split('\n').map(row => JSON.parse(row))
+    let pdata: Array<comment> = parsed;
+    pdata.forEach(d => d.annotation = {...annotationDefault})
+    setComments(pdata)
+    setFilename(files[0].name)
+  }
+
+  function readFileAsText(file: Blob): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error);
+      reader.onload = () => resolve((reader.result as string) || '');
+      reader.readAsText(file);
+    });
+  }
+
+  function downloadComments() {
+    const blob = new Blob([comments.map(comment => JSON.stringify(comment)).join("\n")], {type: "text/json"})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a");
+    document.body.appendChild(a);
+    a.download = `download_${filename}`;
+    a.href = url;
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  const checkboxStyle = {color: "silver"};
+
   return (
-    <Container maxWidth="md">
-      <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-        {comments.map((comment) => {
-          const labelId = `checkbox-list-secondary-label-${comment.id}`;
-          return (
-            <ListItem
-              key={comment.id}
-              disablePadding
-            >
-              <ListItemButton>
-                <ListItemIcon>
-                  { comment.authorDetails.isChatSponsor && <TokenIcon />}
-                  { comment.authorDetails.isChatModerator && <BuildIcon />}
-                </ListItemIcon>
-                <ListItemAvatar>
-                  <Avatar
-                    alt={`Avatar n°${comment.authorDetails.displayName}`}
-                    src={comment.authorDetails.profileImageUrl}
+    <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: "row", justifyContent: "space-between" }}>
+      <Box sx={{ display: 'flex', flexDirection: "column", alignContent: "flex-start" }}>
+        <Button variant="contained" component="label" sx={{textAlign: "center", width: "80%", marginBottom: "10px"}}>
+          Upload comments
+          <input hidden type="file" accept=".jsonl" onChange={changeUploadFile}/>
+        </Button>
+        <Button variant="contained" component="label" sx={{textAlign: "center", width: "80%"}} onClick={downloadComments}>
+          Download comments
+        </Button>
+      </Box>
+      <Box>
+        <List dense sx={{ width: '100%', backgroundColor: '#111111', color: 'white' }}>
+          {comments.map((comment) => {
+            const labelId = `checkbox-list-secondary-label-${comment.id}`;
+            return (
+              <ListItem
+                key={comment.id}
+                disablePadding
+              >
+                <ListItemButton>
+                  <Tooltip title="member/moderator">
+                    <ListItemIcon>
+                      { comment.authorDetails.isChatSponsor && <TokenIcon sx={{color: "white"}}/>}
+                      { comment.authorDetails.isChatModerator && <BuildIcon sx={{color: "white"}}/>}
+                    </ListItemIcon>
+                  </Tooltip>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt={`Avatar n°${comment.authorDetails.displayName}`}
+                      src={comment.authorDetails.profileImageUrl}
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    id={labelId}
+                    primary={comment.authorDetails.displayName}
+                    sx={{width: "15%", color: comment.authorDetails.isChatSponsor ? "green" : "silver", fontWeight: "bold"}}
                   />
-                </ListItemAvatar>
-                <ListItemText id={labelId} primary={`${comment.snippet.messageText}`} />
-                <Checkbox
-                  name="slander"
-                  edge="end"
-                  onChange={(e) => reverseAnnotationOf(e.target.name, comment.id)}
-                  checked={comment.annotation?.isSlander == true}
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
-                <Checkbox
-                  name="instruction"
-                  edge="end"
-                  onChange={(e) => reverseAnnotationOf(e.target.name, comment.id)}
-                  checked={comment.annotation?.isInstruction == true}
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
-                <Checkbox
-                  name="autonomy"
-                  edge="end"
-                  onChange={(e) => reverseAnnotationOf(e.target.name, comment.id)}
-                  checked={comment.annotation?.isAutonomy == true}
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
-      
+                  <ListItemText
+                    id={labelId}
+                    primary={comment.snippet.displayMessage}
+                    sx={{width: "60%", backgroundColor: comment.snippet.type == "superChatEvent" ? "#B8860B" : "inherit"}}
+                  />
+                  <Tooltip title="Slander">
+                    <Checkbox
+                      name="slander"
+                      onChange={(e) => reverseAnnotationOf(e.target.name, comment.id)}
+                      checked={comment.annotation?.isSlander == true}
+                      inputProps={{ 'aria-labelledby': labelId }}
+                      sx={checkboxStyle}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Instruction">
+                  <Checkbox
+                    name="instruction"
+                    onChange={(e) => reverseAnnotationOf(e.target.name, comment.id)}
+                    checked={comment.annotation?.isInstruction == true}
+                    inputProps={{ 'aria-labelledby': labelId }}
+                    sx={checkboxStyle}
+                  />
+                  </Tooltip>
+                  <Tooltip title="Autonomy">
+                  <Checkbox
+                    name="autonomy"
+                    onChange={(e) => reverseAnnotationOf(e.target.name, comment.id)}
+                    checked={comment.annotation?.isAutonomy == true}
+                    inputProps={{ 'aria-labelledby': labelId }}
+                    sx={checkboxStyle}
+                  />
+                  </Tooltip>
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
     </Container>
   )
 }
