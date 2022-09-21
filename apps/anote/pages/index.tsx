@@ -39,7 +39,7 @@ const Home: NextPage = () => {
   async function changeUploadFile(event: any) {
     const files = event.target.files;
     const text = await readFileAsText(files[0]);
-    const parsed = text.split('\n').map(row => JSON.parse(row))
+    const parsed = text.split('\n').filter(row => row !== "").map(row => JSON.parse(row))
     let pdata: Array<comment> = parsed;
     pdata.forEach(d => d.annotation = {...annotationDefault})
     setComments(pdata)
