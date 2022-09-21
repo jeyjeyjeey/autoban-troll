@@ -62,4 +62,4 @@ if __name__ == "__main__":
                 json.dump(line, f, ensure_ascii=False)
                 f.write("\n")
 
-        sleep(60)
+        sleep(10)
