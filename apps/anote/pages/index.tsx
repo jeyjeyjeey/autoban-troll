@@ -69,11 +69,11 @@ const Home: NextPage = () => {
 
   const checkboxStyle = {color: "silver"};
   const chatColorFor = (chatType: string) => {
-    if (chatType == "superStickerEvent") {
-      return "#004400"
-    }
-    else if (chatType == "superChatEvent") {
+    if (["superStickerEvent", "superChatEvent"].some(e => e === chatType)) {
       return "#B8860B"
+    }
+    else if (chatType == "memberMilestoneChatEvent") {
+      return "#004400"
     }
     else {
       return "inherit"
