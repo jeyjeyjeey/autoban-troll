@@ -60,7 +60,7 @@ const Home: NextPage = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a");
     document.body.appendChild(a);
-    a.download = `download_${filename}`;
+    a.download = `anotated_${filename}`;
     a.href = url;
     a.click();
     a.remove();
