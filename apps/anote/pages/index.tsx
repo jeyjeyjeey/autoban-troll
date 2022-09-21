@@ -68,6 +68,17 @@ const Home: NextPage = () => {
   }
 
   const checkboxStyle = {color: "silver"};
+  const chatColorFor = (chatType: string) => {
+    if (chatType == "superStickerEvent") {
+      return "#004400"
+    }
+    else if (chatType == "superChatEvent") {
+      return "#B8860B"
+    }
+    else {
+      return "inherit"
+    }
+  }
 
   return (
     <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: "row", justifyContent: "space-between" }}>
@@ -110,7 +121,7 @@ const Home: NextPage = () => {
                   <ListItemText
                     id={labelId}
                     primary={comment.snippet.displayMessage}
-                    sx={{width: "60%", backgroundColor: comment.snippet.type == "superChatEvent" ? "#B8860B" : "inherit"}}
+                    sx={{width: "60%", backgroundColor: chatColorFor(comment.snippet.type)}}
                   />
                   <Tooltip title="Slander">
                     <Checkbox
